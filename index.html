@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>GDKT&PL 11 | ÔN TẬP GIỮA KÌ II</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #1a237e;
+            --secondary: #0d47a1;
+            --accent: #ffd700;
+            --light: #e8eaf6;
+            --dark: #0a0f2e;
+            --gradient: linear-gradient(145deg, #1a237e, #0d47a1);
+            --shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(145deg, #0a0f2e, #1a237e);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* POPUP DONATE */
+        .donate-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .donate-modal.show {
+            display: flex;
+        }
+
+        .donate-card {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 32px;
+            padding: 24px 20px;
+            position: relative;
+            animation: slideUp 0.3s;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-donate {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .donate-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .donate-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .bank-grid {
+            background: linear-gradient(145deg, #f8f9fa, #e8eaf6);
+            border-radius: 20px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .bank-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ccc;
+            font-size: 14px;
+        }
+
+        .bank-row:last-child {
+            border-bottom: none;
+        }
+
+        .bank-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .bank-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(145deg, #1a237e, #0d47a1);
+            border-radius: 28px;
+            padding: 24px 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(5px);
+            padding: 8px 16px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-number {
+            color: var(--accent);
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        /* PROGRESS */
+        .progress-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .progress-percent {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* SECTION */
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 0 4px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-count {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* QUESTION CARD */
+        .question-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .question-card:active {
+            transform: scale(0.99);
+        }
+
+        .question-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .question-number {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .question-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .option:active {
+            background: #e8eaf6;
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        /* STATEMENT */
+        .statement-item {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .statement-text {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .statement-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stmt-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .stmt-option:active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .stmt-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+
+        /* SUBMIT BUTTON */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(145deg, #1a237e, #0d47a1);
+            border: none;
+            border-radius: 40px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(26,35,126,0.3);
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 5px 10px rgba(26,35,126,0.3);
+        }
+
+        /* RESULT MODAL */
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 900;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .result-modal.show {
+            display: flex;
+        }
+
+        .result-card {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 32px;
+            padding: 24px 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .result-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .result-score {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--secondary);
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .score-box {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .score-box-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .score-box-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .wrong-list {
+            background: #fff5f5;
+            border-radius: 20px;
+            padding: 16px;
+            margin: 16px 0;
+            border: 1px solid #ffcdd2;
+        }
+
+        .wrong-title {
+            color: #c62828;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wrong-item {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 3px solid #c62828;
+            font-size: 13px;
+        }
+
+        .wrong-question {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .wrong-answer {
+            color: #c62828;
+            margin-bottom: 4px;
+        }
+
+        .correct-answer {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .close-result {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(145deg, #1a237e, #0d47a1);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* DONATE BUTTON */
+        .donate-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ff4757, #ff6b81);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255,71,87,0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .donate-float:active {
+            transform: scale(0.9);
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- POPUP DONATE -->
+    <div class="donate-modal" id="donateModal">
+        <div class="donate-card">
+            <span class="close-donate" onclick="closeDonate()">&times;</span>
+            <div class="donate-icon">⚖️</div>
+            <div class="donate-title">Ủng hộ mình nhé!</div>
+            <div class="bank-grid">
+                <div class="bank-row">
+                    <span class="bank-label">🏦 MB Bank</span>
+                    <span class="bank-value">0985 658 044</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">👤 Chủ TK</span>
+                    <span class="bank-value">TRẦN ĐÌNH CƯỜNG</span>
+                </div>
+                <div class="bank-row">
+                    <span class="bank-label">📱 Zalo Pay</span>
+                    <span class="bank-value">0985 658 044</span>
+                </div>
+            </div>
+            <div style="text-align: center; color: var(--primary); font-weight: 600;">
+                Cảm ơn bạn! 🍀
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>GDKT&PL 11</h1>
+            <p>Ôn tập giữa kì II • 2025-2026</p>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <span class="stat-number">50</span> Trắc nghiệm
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">7</span> Đúng/Sai
+                </div>
+            </div>
+        </div>
+
+        <!-- PROGRESS -->
+        <div class="progress-card">
+            <div class="progress-header">
+                <span class="progress-title">Tiến độ ôn tập</span>
+                <span class="progress-percent" id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-stats">
+                <span>Đã làm: <span id="progressDone">0</span></span>
+                <span>Tổng: <span id="progressTotal">78</span></span>
+            </div>
+        </div>
+
+        <!-- TRẮC NGHIỆM -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">📝 Trắc nghiệm</div>
+                <div class="section-count">50 câu</div>
+            </div>
+            <div id="tnContainer"></div>
+        </div>
+
+        <!-- ĐÚNG/SAI -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">✅ Đúng/Sai</div>
+                <div class="section-count">7 câu (28 ý)</div>
+            </div>
+            <div id="dsContainer"></div>
+        </div>
+
+        <!-- SUBMIT BUTTON -->
+        <button class="submit-btn" onclick="submitExam()">📊 NỘP BÀI</button>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            Dev: TRẦN ĐÌNH CƯỜNG
+        </div>
+    </div>
+
+    <!-- RESULT MODAL -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-card">
+            <div class="result-header">
+                <div class="result-icon">📊</div>
+                <div class="result-title">Kết quả</div>
+            </div>
+            <div class="result-score" id="resultScore">0/78</div>
+            
+            <div class="score-grid">
+                <div class="score-box">
+                    <div class="score-box-label">Trắc nghiệm</div>
+                    <div class="score-box-value" id="tnScore">0/50</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-box-label">Đúng/Sai</div>
+                    <div class="score-box-value" id="dsScore">0/28</div>
+                </div>
+            </div>
+
+            <div id="wrongList" class="wrong-list"></div>
+
+            <button class="close-result" onclick="closeResult()">ĐÓNG</button>
+        </div>
+    </div>
+
+    <!-- DONATE BUTTON -->
+    <button class="donate-float" onclick="showDonate()">❤️</button>
+
+    <script>
+        // DỮ LIỆU TRẮC NGHIỆM (50 CÂU)
+        const tnData = [
+            { id: 1, question: "Bất kì công dân nào khi có đủ điều kiện theo quy định của pháp luật đều được", options: ["A. sở hữu mọi loại tài nguyên.", "B. hưởng các quyền công dân.", "C. xóa bỏ tập quán vùng miền.", "D. bài trừ văn hóa truyền thông."], correct: 1 },
+            { id: 2, question: "Một trong những quy định của pháp luật về bình đẳng giới trong lĩnh vực kinh tế là cả nam và nữ đều bình đẳng trong việc thực hiện quyền", options: ["A. kinh doanh.", "B. bầu cử.", "C. tài sản.", "D. nhân thân."], correct: 0 },
+            { id: 3, question: "Việc đảm bảo một tỷ lệ thích hợp nữ đại biểu Quốc hội, đại biểu Hội đồng nhân dân các cấp là phù hợp với mục tiêu quốc gia về bình đẳng giới trên lĩnh vực", options: ["A. chính trị.", "B. kinh tế.", "C. gia đình.", "D. văn hóa."], correct: 0 },
+            { id: 4, question: "Việc nam, nữ có vị trí, vai trò ngang nhau, được tạo điều kiện và cơ hội phát huy năng lực của mình cho sự phát triển của cộng đồng, gia đình và thụ hưởng như nhau về thành quả của sự phát triển đó là nội dung khái niệm nào sau đây?", options: ["A. Phúc lợi xã hội.", "B. An sinh xã hội.", "C. Bảo hiểm xã hội.", "D. Bình đẳng giới."], correct: 3 },
+            { id: 5, question: "Bình đẳng giới có tác động như thế nào đến nền kinh tế?", options: ["A. Giúp quốc gia phát triển kinh tế sâu rộng nhất.", "B. Góp phần phát triển nguồn nhân lực hiệu quả.", "C. Có tác động tiêu cực đến nền kinh tế.", "D. Chỉ thúc đẩy phát triển cho nam giới."], correct: 1 },
+            { id: 6, question: "Phát biểu nào sau đây là sai về ý nghĩa quyền bình đẳng giữa các dân tộc?", options: ["A. Góp phần tăng cường khối đại đoàn kết dân tộc.", "B. Góp phần thu hẹp khoảng cách giữa các dân tộc.", "C. Củng cố, phát huy truyền thống dân tộc.", "D. Các dân tộc đều bình đẳng về quyền lợi và nghĩa vụ."], correct: 3 },
+            { id: 7, question: "Nội dung nào sau đây thể hiện quy định của pháp luật về sự bình đẳng của công dân trong việc thực hiện nghĩa vụ trước Nhà nước và xã hội?", options: ["A. Bí mật xác lập di chúc thừa kế.", "B. Tìm hiểu loại hình dịch vụ.", "C. Lựa chọn giao dịch dân sự.", "D. Tham gia bảo vệ an ninh quốc gia."], correct: 3 },
+            { id: 8, question: "Một trong những hậu quả của hành vi vi phạm quyền và nghĩa vụ của công dân về bầu cử và ứng cử là dẫn đến", options: ["A. mất thời gian kiểm đếm.", "B. công dân phải nghỉ làm.", "C. uy tín của cử tri giảm sút.", "D. sai lệch kết quả bầu cử."], correct: 3 },
+            { id: 9, question: "Nội dung nào sau đây không phải là quyền của công dân trong tham gia quản lý nhà nước và xã hội?", options: ["A. Biểu quyết khi Nhà nước tổ chức trưng cầu ý dân.", "B. Tham gia góp ý kiến xây dựng các văn bản quy phạm pháp luật.", "C. Tham gia bàn và quyết định trực tiếp những vấn đề liên quan đến đời sống ở cơ sở.", "D. Tôn trọng quyền và lợi ích hợp pháp của cá nhân, cơ quan, tổ chức."], correct: 3 },
+            { id: 10, question: "Nội dung nào sau đây không đúng quy định về quyền bầu cử, ứng cử của công dân?", options: ["A. Công dân được lựa chọn người đại biểu của mình vào cơ quan quyền lực Nhà nước.", "B. Khi đủ điều kiện công dân được ứng cử đại biểu Quốc hội, Hội đồng nhân dân các cấp.", "C. Việc thực hiện quyền bầu cử, ứng cử thực hiện bình đẳng, trừ trường hợp pháp luật quy định.", "D. Mọi công dân đều được bầu cử, ứng cử, không bị phân biệt đối xử."], correct: 3 },
+            { id: 11, question: "Nhận định nào dưới đây đúng về quyền bầu cử, ứng cử của công dân?", options: ["A. Công dân từ 18 tuổi trở lên có quyền bầu cử và từ 21 tuổi trở lên có quyền ứng cử, trừ trường hợp do pháp luật quy định.", "B. Công dân từ 21 tuổi trở lên có quyền bầu cử và từ 18 tuổi trở lên có quyền ứng cử, trừ trường hợp do pháp luật quy định.", "C. Mọi công dân có quyền bầu cử đều được ghi tên vào danh sách cử tri và được phát thẻ cử tri, trừ trường hợp do pháp luật quy định.", "D. Chỉ những người có năng lực, trình độ mới được thực hiện quyền bầu cử, ứng cử."], correct: 0 },
+            { id: 12, question: "Một trong những hậu quả của hành vi vi phạm quyền và nghĩa vụ của công dân trong tham gia quản lí Nhà nước và xã hội là", options: ["A. làm cho Nhà nước thiếu tin tưởng vào nhân dân.", "B. phát huy tốt tiềm lực của nhân dân trong quản lí nhà nước và xã hội.", "C. làm cho uy tín của cử tri giảm sút.", "D. không phát huy được vai trò, tính tích cực và sáng tạo của công dân."], correct: 3 },
+            { id: 13, question: "Khi thực hiện quyền bầu cử đại biểu Quốc hội và đại biểu Hội đồng nhân dân các cấp, công dân cần thực hiện theo nguyên tắc nào?", options: ["A. Phổ thông, bình đẳng, trực tiếp, bỏ phiếu kín.", "B. Phổ thông, công bằng, trực tiếp, bỏ phiếu kín.", "C. Dân chủ, bình đẳng, trực tiếp, bỏ phiếu kín.", "D. Phổ thông, bình đẳng, gián tiếp, bỏ phiếu kín."], correct: 0 },
+            { id: 14, question: "Pháp luật quy định, quyền bầu cử của công dân bao gồm", options: ["A. việc đề cử, giới thiệu ứng cử và bỏ phiếu bầu đại biểu Quốc hội và hội đồng nhân dân các cấp.", "B. việc thể hiện nguyện vọng của mình được ứng cử đại biểu Quốc hội và hội đồng nhân dân các cấp.", "C. việc giới thiệu người thân của mình vào Quốc hội và hội đồng nhân dân các cấp.", "D. việc đề cử, giới thiệu ứng cử và ghi tên vào danh sách cử tri bầu đại biểu Hội đồng nhân dân các cấp."], correct: 0 },
+            { id: 15, question: "Việc công dân kiến nghị với các cơ quan nhà nước về xây dựng bộ máy nhà nước và phát triển kinh tế - xã hội ở địa phương và đất nước là thể hiện quyền", options: ["A. Tham gia phát triển kinh tế - xã hội.", "B. Dân chủ trong xã hội.", "C. Tham gia quản lý nhà nước và xã hội.", "D. Tự do ngôn luận."], correct: 2 },
+            { id: 16, question: "Theo quy định của luật bầu cử, cử tri đủ điều kiện tham gia bầu cử được quyền ghi tên vào mấy danh sách cử tri ở nơi mình thường trú hoặc tạm trú?", options: ["A. 2.", "B. 1.", "C. 3.", "D. 4."], correct: 1 },
+            { id: 17, question: "Theo quy định của pháp luật, công dân đủ bao nhiêu tuổi trở lên thì có quyền tham gia bầu cử?", options: ["A. 21 tuổi.", "B. 17 tuổi.", "C. 19 tuổi.", "D. 18 tuổi."], correct: 3 },
+            { id: 18, question: "Hiến pháp quy định công dân Việt Nam đủ bao nhiêu tuổi trở lên có quyền ứng cử?", options: ["A. 16.", "B. 18.", "C. 17.", "D. 21."], correct: 3 },
+            { id: 19, question: "Phát biểu nào sau đây là sai về quyền bầu cử của công dân?", options: ["A. Quyền bầu cử là quyền dân chủ của công dân trên lĩnh vực xã hội.", "B. Quyền bầu cử là quyền của công dân tham gia lựa chọn đại biểu vào cơ quan nhà nước.", "C. Quyền bầu cử là quyền của công dân giới thiệu người khác tham gia ứng cử.", "D. Quyền bầu cử là quyền của công dân tham gia bỏ phiếu bầu cử."], correct: 0 },
+            { id: 20, question: "Mọi công dân, nam, nữ thuộc các dân tộc, tôn giáo, thành phần, địa vị xã hội khác nhau đều không bị phân biệt đối xử trong hưởng quyền, thực hiện nghĩa vụ của mình là", options: ["A. bình đẳng về kinh tế.", "B. bình đẳng về quyền và nghĩa vụ.", "C. bình đẳng về chính trị.", "D. bình đẳng về trách nhiệm pháp lí."], correct: 1 },
+            { id: 21, question: "Hiến pháp nước Cộng hòa Xã hội Chủ Nghĩa Việt Nam năm 2013 quy định mọi công dân đều", options: ["A. bình đẳng về quyền lợi.", "B. bình đẳng về nghĩa vụ.", "C. bình đẳng trước pháp luật.", "D. bình đẳng trước Nhà nước."], correct: 2 },
+            { id: 22, question: "Bất kỳ công dân nào vi phạm pháp luật đều phải chịu trách nhiệm về hành vi vi phạm của mình và bị xử lí theo quy định của pháp luật. Điều này thể hiện công dân bình đẳng về", options: ["A. trách nhiệm kinh tế.", "B. trách nhiệm chính trị.", "C. trách nhiệm xã hội.", "D. trách nhiệm pháp lí."], correct: 3 },
+            { id: 23, question: "Nội dung nào sau đây thể hiện quy định của pháp luật về sự bình đẳng của công dân trong việc thực hiện nghĩa vụ trước Nhà nước và pháp luật?", options: ["A. Nộp thuế theo luật định.", "B. Chia sẻ bí quyết gia truyền.", "C. Công khai gia phả dòng họ.", "D. Tự chuyển quyền nhân thân."], correct: 0 },
+            { id: 24, question: "Phát biểu nào dưới đây là sai về bình đẳng giới trong lĩnh vực lao động?", options: ["A. Nam nữ được đối xử bình đẳng về bảo hiểm xã hội.", "B. Nam nữ bình đẳng trong tiếp cận vốn vay.", "C. Nam nữ bình đẳng khi tiếp cận điều kiện lao động.", "D. Nam nữ bình đẳng về tiền công, tiền thưởng."], correct: 1 },
+            { id: 25, question: "Ở nước ta hiện nay, nam nữ bình đẳng trong về tiêu chuẩn, độ tuổi khi được đề bạt, bổ nhiệm vào cùng vị trí quản lý, lãnh đạo của cơ quan tổ chức là thể hiện bình đẳng giới trong lĩnh vực", options: ["A. chính trị.", "B. văn hóa.", "C. kinh tế.", "D. gia đình."], correct: 0 },
+            { id: 26, question: "Một trong những quy định của pháp luật về bình đẳng giới trong lĩnh vực giáo dục và đào tạo là cả nam và nữ đều bình đẳng trong việc lựa chọn", options: ["A. biện pháp chăm sóc con cái.", "B. hình thức sản xuất kinh doanh.", "C. biện pháp kế hoạch hóa gia đình.", "D. ngành nghề học tập và đào tạo."], correct: 3 },
+            { id: 27, question: "Công dân Việt Nam thuộc các dân tộc khác nhau khi đủ điều kiện mà pháp luật quy định đều có quyền tham gia quản lý nhà nước và xã hội, là thể hiện quyền bình đẳng giữa các dân tộc về", options: ["A. xã hội.", "B. văn hóa, giáo dục.", "C. kinh tế.", "D. chính trị."], correct: 3 },
+            { id: 28, question: "Nhà nước quan tâm hỗ trợ vốn đối với vùng sâu, vùng xa, vùng đặc biệt khó khăn là thể hiện nội dung quyền bình đẳng giữa các dân tộc về", options: ["A. kinh tế.", "B. tín ngưỡng.", "C. truyền thông.", "D. tôn giáo."], correct: 0 },
+            { id: 29, question: "Các tổ chức tôn giáo, cũng như người theo các tôn giáo khác nhau dù ở bất kì cương vị nào nếu vi phạm pháp luật", options: ["A. được quyền phủ nhận lời khai nhân chứng.", "B. phải tham gia lao động công ích.", "C. phải từ bỏ sở hữu mọi tài sản.", "D. bị xử lí theo quy định của pháp luật."], correct: 3 },
+            { id: 30, question: "Quyền tự do tín ngưỡng tôn giáo của công dân thể hiện ở việc, mọi công dân đều có quyền", options: ["A. xây dựng cơ sở tôn giáo.", "B. thành lập tổ chức tôn giáo.", "C. lợi dụng tôn giáo để vi phạm.", "D. theo hoặc không theo tôn giáo."], correct: 3 },
+            { id: 31, question: "Theo quy định của pháp luật, công dân thực hiện quyền tham gia quản lý nhà nước và xã hội trong trường hợp nào sau đây?", options: ["A. Giám sát hoạt động nhóm từ thiện.", "B. Sử dụng dịch vụ công trực tuyến.", "C. Giám sát việc thực hiện pháp luật.", "D. Tìm hiểu hoạt động chuyển đổi số."], correct: 2 },
+            { id: 32, question: "Công dân thực hiện tốt nghĩa vụ tham gia quản lý nhà nước và xã hội khi tích cực tham gia giữ gìn", options: ["A. hình ảnh bản thân mình.", "B. bí quyết kinh doanh.", "C. an ninh trật tự nơi sinh sống.", "D. thông tin đời sống cá nhân."], correct: 2 },
+            { id: 33, question: "Công dân thực hiện tốt nghĩa vụ tham gia quản lý nhà nước và xã hội khi chủ động thực hiện tốt các quy tắc", options: ["A. phù hợp lợi ích cá nhân.", "B. gia đình đặt ra.", "C. sinh hoạt công cộng.", "D. do bản thân đặt ra."], correct: 2 },
+            { id: 34, question: "Khi thực hiện quyền bầu cử, công dân được quyền", options: ["A. xuyên tạc kết quả bầu cử.", "B. tiếp cận các thông tin về bầu cử.", "C. lôi kéo, mua chuộc cử tri.", "D. gian lận thông tin lý lịch cử tri."], correct: 1 },
+            { id: 35, question: "Một trong những hậu quả của hành vi vi phạm quyền và nghĩa vụ của công dân về bầu cử và ứng cử là dẫn đến", options: ["A. giảm lòng tin của nhân dân.", "B. giảm thời gian nghỉ ngơi.", "C. sai dự toán kinh phí.", "D. sai lệch cơ cấu đại biểu."], correct: 0 },
+            { id: 36, question: "Theo quy định của pháp luật, nội dung nào dưới đây là biện pháp thúc đẩy bình đẳng giới trong lĩnh vực kinh tế?", options: ["A. Doanh nghiệp đảm bảo an toàn cho lao động nữ khi làm việc nặng nhọc.", "B. Nam, nữ bình đẳng trong việc thành lập và điều hành doanh nghiệp.", "C. Nam, nữ bình đẳng về tiêu chuẩn, độ tuổi khi được đề bạt, bổ nhiệm.", "D. Doanh nghiệp sử dụng nhiều lao động nữ được ưu đãi về thuế."], correct: 3 },
+            { id: 37, question: "Việc làm nào dưới đây thể hiện quyền bình đẳng giới trên lĩnh vực chính trị?", options: ["A. Đăng ký học nâng cao trình độ.", "B. Góp ý dự thảo Luật đất đai sửa đổi.", "C. Hưởng trợ cấp tai nạn lao động.", "D. Đăng ký thành lập doanh nghiệp."], correct: 1 },
+            { id: 38, question: "Theo quy định của pháp luật, nội dung nào dưới đây là biện pháp thúc đẩy bình đẳng giới trong lĩnh vực kinh tế?", options: ["A. Quy định tỷ lệ nam nữ khi tuyển dụng.", "B. Bảo đảm tỷ lệ nữ đại biểu Quốc hội.", "C. Ưu đãi thuế với doanh nghiệp nhiều lao động nữ.", "D. Quy định điều kiện an toàn đối với lao động nữ."], correct: 2 },
+            { id: 39, question: "Nội dung nào dưới đây không phản ánh ý nghĩa của việc thực hiện bình đẳng giới trong đời sống xã hội?", options: ["A. là nhân tố duy nhất đảm bảo sự phát triển bền vững của đất nước.", "B. tạo điều kiện, cơ hội để nam và nữ phát huy năng lực của mình.", "C. củng cố quan hệ hợp tác, hỗ trợ nhau trong đời sống gia đình và xã hội.", "D. góp phần cải thiện và đóng góp vào sự phát triển bền vững của xã hội."], correct: 0 },
+            { id: 40, question: "Nội dung quyền bình đẳng giới trên lĩnh vực chính trị không thể hiện ở việc cả nam và nữ đều cùng nhau được", options: ["A. tham gia quản lý nhà nước.", "B. tham gia hưởng thụ văn hóa.", "C. tham gia bầu cử và ứng cử.", "D. tham gia quản lý xã hội."], correct: 1 },
+            { id: 41, question: "Trên lĩnh vực lao động, bình đẳng giới thể hiện ở việc cả nam và nữ đều có quyền ngang nhau khi được", options: ["A. mở rộng sản xuất.", "B. tiếp cận thông tin.", "C. bầu cử, ứng cử.", "D. đề bạt, bổ nhiệm."], correct: 3 },
+            { id: 42, question: "Theo quy định của pháp luật, quyền bình đẳng giữa các dân tộc trong lĩnh vực chính trị thể hiện ở việc các dân tộc trong cộng đồng dân tộc Việt Nam đều có quyền", options: ["A. tham gia phát triển du lịch cộng đồng.", "B. hỗ trợ chi phí học tập đại học.", "C. khám chữa bệnh theo quy định.", "D. tham gia quản lý nhà nước và xã hội."], correct: 3 },
+            { id: 43, question: "Theo quy định của pháp luật, nội dung nào dưới đây không vi phạm bình đẳng trong lĩnh vực chính trị giữa các dân tộc?", options: ["A. Người dân tộc thiểu số không có quyền bầu cử.", "B. Ngăn cản đồng bào dân tộc đi bầu cử.", "C. Nhận xét hồ sơ các ứng viên người dân tộc.", "D. Từ chối tiếp nhận đơn khiếu nại."], correct: 2 },
+            { id: 44, question: "Ở nước ta hiện nay thực hiện tốt việc đoàn kết giữa các dân tộc sẽ góp phần đấu tranh làm thất bại âm mưu của các thế lực thù địch nhằm phá hoại", options: ["A. các nền kinh tế mới nổi.", "B. đoàn kết giữa các dân tộc.", "C. tình đoàn kết quốc tế.", "D. chính sách độc quyền."], correct: 1 },
+            { id: 45, question: "Theo quy định của pháp luật, quyền bình đẳng giữa các dân tộc trong lĩnh vực giáo dục không thể hiện ở việc các dân tộc trong cộng đồng dân tộc Việt Nam đều có quyền", options: ["A. được học thường xuyên, học suốt đời.", "B. có quyền học tập không hạn chế.", "C. bình đẳng về cơ hội trong học tập.", "D. được nhà nước cử tuyển học đại học."], correct: 3 },
+            { id: 46, question: "Việc làm nào dưới đây góp phần thực hiện quyền bình đẳng giữa các tôn giáo?", options: ["A. Xuyên tạc nội dung tôn giáo.", "B. Chia rẽ người theo Đạo.", "C. Phá hoại kiến trúc tôn giáo.", "D. Xóa bỏ tôn giáo bất hợp pháp."], correct: 3 },
+            { id: 47, question: "Trong hội nghị tổng kết cuối năm, một số người dân xã S đã yêu cầu kế toán xã giải trình về khoản thu, chi quỹ 'Đền ơn đáp nghĩa'. Người dân xã S đã thực hiện đúng quyền dân chủ nào dưới đây?", options: ["A. Tham gia quản lí nhà nước và xã hội.", "B. Tự do ngôn luận.", "C. Chủ động kiểm toán ngân sách quốc gia.", "D. Độc lập phán quyết."], correct: 0 },
+            { id: 48, question: "Việc làm nào dưới đây thể hiện công dân thực hiện tốt nghĩa vụ tham gia quản lý nhà nước và xã hội?", options: ["A. Chủ động chuyển đổi số.", "B. Tiếp cận thông tin khoa học.", "C. Sử dụng dịch vụ công cộng.", "D. Giữ gìn an ninh trật tự."], correct: 3 },
+            { id: 49, question: "Theo quy định của pháp luật, tại thời điểm tổ chức bầu cử, cử tri không vi phạm quyền và nghĩa vụ của công dân về bầu cử khi", options: ["A. độc lập lựa chọn ứng cử viên.", "B. công khai nội dung đã viết vào phiếu bầu.", "C. tự ý bỏ phiếu thay người khác.", "D. ủy quyền thực hiện nghĩa vụ bầu cử."], correct: 0 },
+            { id: 50, question: "Theo quy định của pháp luật, hành vi nào dưới đây không vi phạm quyền và nghĩa vụ của công dân về bầu cử, ứng cử?", options: ["A. Chia sẻ lý lịch ứng cử viên.", "B. Chia sẻ nội dung phiếu bầu.", "C. Mua chuộc phiếu bầu cho mình.", "D. Bỏ phiếu thay người khác."], correct: 0 }
+        ];
+
+        // DỮ LIỆU ĐÚNG/SAI (7 CÂU)
+        const dsData = [
+            {
+                id: 1,
+                text: "Trong đợt kiểm tra đột xuất trên địa bàn xã H, Đội quản lí thị trường huyện T phát hiện 2 cửa hàng kinh doanh đang bán hàng hoá nhập lậu. Cửa hàng của bà X bán đồ chơi điện tử nhập lậu trị giá 40 triệu đồng; cửa hàng của bà Y bán rượu, thuốc lá nhập lậu trị giá 60 triệu đồng. Căn cứ vào mức độ vi phạm của mỗi cửa hàng, Đội trưởng Đội Quản lí thị trường huyện T đã lập biên bản xử phạt vi phạm hành chính đối với cửa hàng bà X và cửa hàng của bà Y.",
+                statements: [
+                    "a) Cửa hàng bà X và bà Y tham gia kinh doanh là bình đẳng về hưởng quyền.",
+                    "b) Đội quản lí thị trường huyện T đã vi phạm quyền bình đẳng của công dân trước pháp luật.",
+                    "c) Đội quản lí thị trường huyện T lập biên bản xử phạt vi phạm hành chính đối với 2 cửa hàng thể hiện công dân bình đẳng về trách nhiệm pháp lí.",
+                    "d) Đội trưởng Đội quản lí thị trường xử phạt hành chính 2 cửa hàng của bà X và bà Y là đảm bảo sự tôn nghiêm của pháp luật."
+                ],
+                correct: [true, false, true, true]
+            },
+            {
+                id: 2,
+                text: "Công dân đã tham gia đóng góp ý kiến vào xây dựng văn bản quy phạm pháp luật: 'việc lấy ý kiến nhân dân về dự thảo sửa đổi Hiến pháp 1992 đã được triển khai sâu rộng, thật sự tạo ra đợt sinh hoạt chính trị pháp lý quan trọng trong các tầng lớp nhân dân… các bộ, ngành, địa phương, hội, đoàn thể trong cả nước đã tiếp nhận khoảng 20 triệu lượt ý kiến góp ý về các nội dung của dự thảo sửa đổi Hiến pháp 1992', 'trên 6 triệu lượt ý kiến góp ý vào Dự thảo Luật Đất đai (sửa đổi)'. Công dân đã tham gia bàn và quyết định trực tiếp những vấn đề liên quan đến đời sống ở cơ sở như sinh sống, làm việc tại các địa phương, cơ quan: Phong trào xây dựng 'Gia đình văn hóa'; thực hiện Quy chế dân chủ ở cơ sở'… Với hình thức gián tiếp, công dân tham gia quản lý nhà nước và xã hội thông qua Quốc hội, Hội đồng nhân dân các cấp, thông qua các tổ chức chính trị - xã hội, các tổ chức xã hội nghề nghiệp.",
+                statements: [
+                    "a) Việc công dân tham gia đóng góp ý kiến vào xây dựng văn bản quy phạm pháp luật không thuộc quyền và nghĩa vụ của công dân trong tham gia quản lý nhà nước và xã hội.",
+                    "b) Công dân chỉ được thực hiện quyền tham gia quản lý nhà nước và xã hội khi tham gia bàn và quyết định trực tiếp những vấn đề liên quan đến đời sống ở cơ sở.",
+                    "c) Công dân có thể thực hiện quyền tham gia quản lý nhà nước và xã hội thông qua Quốc hội, Hội đồng nhân dân các cấp.",
+                    "d) Việc góp ý về các nội dung của dự thảo sửa đổi Hiến pháp 1992 là quyền của công dân trong tham gia quản lý nhà nước và xã hội."
+                ],
+                correct: [false, false, true, true]
+            },
+            {
+                id: 3,
+                text: "Vợ chồng bình đẳng với nhau trong quan hệ dân sự và các quan hệ khác liên quan đến hôn nhân và gia đình; có quyền, nghĩa vụ ngang nhau trong sở hữu tài sản chung, bình đẳng trong sử dụng nguồn thu nhập chung của vợ, chồng và quyết định các nguồn lực trong gia đình; bình đẳng với nhau trong quan hệ dân sự và các quan hệ khác liên quan đến hôn nhân và gia đình cũng như trong việc bàn bạc, quyết định lựa chọn và sử dụng biện pháp kế hoạch hoá gia đình phù hợp, sử dụng thời gian nghỉ chăm sóc con ốm theo quy định của pháp luật. Con trai, con gái được gia đình chăm sóc, giáo dục và tạo điều kiện như nhau để học tập, lao động, vui chơi, giải trí và phát triển.",
+                statements: [
+                    "a) Vợ và chồng có quyền và nghĩa vụ ngang nhau trong việc lựa chọn và sử dụng biện pháp kế hoạch hoá gia đình là bình đẳng giới trong quan hệ nhân thân.",
+                    "b) Bình đẳng giới trong gia đình thể hiện ở việc giữa vợ và chồng đều có quyền và nghĩa vụ ngang nhau đối với tài sản chung.",
+                    "c) Bình đẳng giới trong gia đình chỉ gắn liền với quyền bình đẳng giữa vợ và chồng trong quan hệ nhân thân và tài sản.",
+                    "d) Đối với nguồn thu nhập chung của vợ và chồng thì cả hai đều có quyền ngang nhau trong việc sở hữu, sử dụng và định đoạt nó."
+                ],
+                correct: [true, true, false, true]
+            },
+            {
+                id: 4,
+                text: "Trong cuộc họp tổng kết năm của xã X có ông A là chủ tịch, ông V là phó chủ tịch, chị M bí thư Đoàn thanh niên và chị H, anh D, anh Y là đại diện các hộ dân của xã cùng tham gia. Khi chị H có ý kiến đề nghị xem xét việc một vài gia đình trong xã sử dụng đất nông nghiệp sai mục đích, cũng như việc cấp đất của chính quyền địa phương có dấu hiệu sai phạm. Vì trong đó có người thân của ông A nên ông đã yêu cầu chị H dừng phát biểu và cho rằng việc này do lãnh đạo xã quyết định, người dân không cần phát biểu ý kiến. Thấy chị H vẫn tiếp tục trình bày ý kiến của mình nên ông V cắt ngang lời và đuổi chị ra ngoài rồi chỉ đạo anh D giám sát chị. Thời gian sau đó, khi triển khai công tác bầu cử đại biểu Quốc hội và hội đồng nhân dân các cấp, ông A đã chỉ đạo ông V không đưa chị H vào danh sách bầu cử với lý do chị H gây rối an ninh trật tự. Biết được thông tin này qua anh Y, cho rằng ông A và ông V cố tình gây khó khăn cho mình, chị H đã cố ý ghép ảnh ông A với chị M có quan hệ bất chính rồi đăng lên mạng xã hội khiến cho uy tín của ông A và chị M bị suy giảm, nhiều cử tri đã kéo tới Ủy ban nhân dân xã yêu cầu ông A và chị M phải từ chức, đồng thời làm đơn rút khỏi danh sách ứng cử nhiệm kỳ tới.",
+                statements: [
+                    "a) Ông V và ông A đã thực hiện chưa đúng quy định của pháp luật về quyền bầu cử và ứng cử của công dân khi không đưa chị H vào danh sách bầu cử.",
+                    "b) Chị H không vi phạm quyền của công dân trong tham gia quản lý nhà nước và xã hội nhưng vi phạm quyền của công dân về bầu cử.",
+                    "c) Chị H có thể làm đơn khiếu nại gửi Hội đồng bầu cử các cấp khiếu nại việc mình không được cấp thẻ cử tri là phù hợp với quy định của pháp luật về bầu cử.",
+                    "d) Việc cử tri yêu cầu ông A và chị M phải từ chức đồng thời làm đơn rút khỏi danh sách ứng cử là thực hiện đúng quyền của công dân về bầu cử, ứng cử."
+                ],
+                correct: [true, false, true, false]
+            },
+            {
+                id: 5,
+                text: "Vợ chồng anh X gặp khó khăn nên đã vay anh T một khoản tiền lớn. Trong đợt bầu cử đại biểu Hội đồng nhân dân tỉnh Y, vợ anh T đã yêu cầu vợ chồng anh X bầu cử cho chồng mình. Mặc dù thấy anh T không xứng đáng nhưng vì đang nợ một khoản tiền lớn nên vợ chồng anh X vẫn chấp nhận làm theo yêu cầu đó. Trong ngày bầu cử vợ chồng anh X nhờ con gái là cháu Q (đang học lớp 10) đến địa điểm bầu cử để bỏ phiếu cho mình nhằm tránh mặt vợ chồng anh T. Tại điểm bầu cử tổ bầu cử không phát phiếu bầu cho cháu Q vì thấy cháu còn nhỏ tuổi, cháu Q không đồng ý vì mình có mang theo thẻ cử tri của bố mẹ. Tổ bầu cử đã đề nghị vợ chồng anh X đến điểm bầu cử để thực hiện việc bỏ phiếu theo đúng quy định.",
+                statements: [
+                    "a) Tổ bầu cử không phát phiếu bầu cho cháu Q là sai quy định vì cháu Q có đem theo thẻ cử tri của bố mẹ.",
+                    "b) Cháu Q chưa đủ tuổi bầu cử.",
+                    "c) Yêu cầu của vợ anh T đã vi phạm nguyên tắc bỏ phiếu kín trong bầu cử.",
+                    "d) Đề nghị của tổ bầu cử đối với vợ chồng anh X là thực hiện nghĩa vụ của công dân trong bầu cử."
+                ],
+                correct: [false, true, true, true]
+            },
+            {
+                id: 6,
+                text: "Sau khi tốt nghiệp đại học chị M đã về làm công chức ở UBND xã X. Trong quá trình làm việc chị M luôn hoàn thành xuất sắc nhiệm vụ được giao, nhiều sáng kiến cải tiến trong công việc của chị được nhân rộng ở các xã khác. Chị dự định sẽ học cao học để nâng cao kiến thức cải tiến chuyên môn nghiệp vụ của bản thân. Trong đợt bầu cử sắp tới, chị M sẽ tham gia ứng cử đại biểu Hội đồng nhân dân xã. Chị đã chủ động tìm hiểu các quy định của pháp luật về hồ sơ, thủ tục tham gia ứng cử và một số quy định có liên quan có thể thực hiện tốt quyền công dân. Đồng thời, chị M chia sẻ dự định với gia đình, bạn bè, đồng nghiệp và bày tỏ mong muốn mọi người tạo điều kiện, hỗ trợ mình đạt được kết quả tốt trong cuộc bầu cử sắp tới. Bố chị M cho rằng, việc tham gia ứng cử đại biểu Hội đồng nhân dân xã phải có tổ chức giới thiệu chứ tự mình thì không thể ứng cử được.",
+                statements: [
+                    "a) Chị M tham gia ứng cử hội đồng nhân dân xã thể hiện bình đẳng giới về mặt xã hội.",
+                    "b) Chị M đã thực hiện tốt nghĩa vụ ứng cử.",
+                    "c) Chị M là phụ nữ không cần thiết phải học cao học vì chị còn phải giành thời gian chăm sóc gia đình.",
+                    "d) Bố chị M cho rằng việc tham gia ứng cử đại biểu Hội đồng nhân dân xã phải có tổ chức giới thiệu chứ tự mình thì không thể ứng cử được, suy nghĩ trên là phù hợp với quy định về ứng cử."
+                ],
+                correct: [true, true, false, false]
+            },
+            {
+                id: 7,
+                text: "Chị H và anh D đều là người dân tộc thiểu số sinh sống trên địa bàn kinh tế khó khăn. Cả hai được nhận vào học tập tại trường Dự bị dân tộc đúng lúc tại địa phương các mô hình phát triển kinh tế rừng đang được nhà nước đặc biệt quan tâm và chú trọng. Sau khi tốt nghiệp đại học về công tác tại địa phương, chị H đã tổ chức phục dựng thành công nhiều lễ hội truyền thống, anh D với mô hình kinh doanh homstay góp phần mang lại hiệu quả kinh tế cao cho bà con trong vùng. Tuy nhiên, khi chị H và anh D nộp hồ sơ tự ứng cử vào Hội đồng nhân dân thì bị anh Q cán bộ tiếp nhận hồ sơ chỉ đồng ý tiếp nhận hồ sơ của anh D còn hồ sơ của chị H bị từ chối với lý do chị H là nữ giới không có khả năng quản lý.",
+                statements: [
+                    "a) Chị H được hưởng quyền bình đẳng giữa các dân tộc trên lĩnh vực giáo dục và văn hóa.",
+                    "b) Việc anh D và chị H đều được tạo điều kiện để vào học tập tại trường dự bị Đại học là thể hiện quyền bình đẳng của công dân trước pháp luật.",
+                    "c) Anh Q đã vi phạm quyền bình đẳng giới trên lĩnh vực chính trị.",
+                    "d) Anh Q loại hồ sơ của chị H vì chị là nữ giới là phù hợp với quy định của pháp luật về bầu cử, ứng cử."
+                ],
+                correct: [true, true, true, false]
+            }
+        ];
+
+        // BIẾN LƯU ĐÁP ÁN
+        let tnAnswers = new Array(tnData.length).fill(null);
+        let dsAnswers = {};
+
+        // RENDER TRẮC NGHIỆM
+        function renderTN() {
+            let html = '';
+            tnData.forEach((q, idx) => {
+                html += `
+                    <div class="question-card">
+                        <div class="question-header">
+                            <div class="question-number">${q.id}</div>
+                            <div class="question-text">${q.question}</div>
+                        </div>
+                        <div class="options">
+                            ${q.options.map((opt, optIdx) => `
+                                <label class="option">
+                                    <input type="radio" name="tn_${q.id}" value="${optIdx}" onchange="saveTN(${idx}, ${optIdx})">
+                                    <span>${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('tnContainer').innerHTML = html;
+        }
+
+        // RENDER ĐÚNG/SAI
+        function renderDS() {
+            let html = '';
+            dsData.forEach(q => {
+                html += `
+                    <div class="question-card">
+                        <div class="question-header">
+                            <div class="question-number">Đ/S ${q.id}</div>
+                            <div class="question-text">Đọc đoạn thông tin</div>
+                        </div>
+                        <div style="background: #f0f4f8; padding: 16px; border-radius: 16px; margin-bottom: 16px; font-size: 14px; color: #333; line-height: 1.6;">
+                            ${q.text}
+                        </div>
+                        ${q.statements.map((stmt, idx) => `
+                            <div class="statement-item">
+                                <div class="statement-text">${stmt}</div>
+                                <div class="statement-options">
+                                    <label class="stmt-option">
+                                        <input type="radio" name="ds_${q.id}_${idx}" value="true" onchange="saveDS(${q.id}, ${idx}, true)"> Đ
+                                    </label>
+                                    <label class="stmt-option">
+                                        <input type="radio" name="ds_${q.id}_${idx}" value="false" onchange="saveDS(${q.id}, ${idx}, false)"> S
+                                    </label>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            });
+            document.getElementById('dsContainer').innerHTML = html;
+        }
+
+        // LƯU ĐÁP ÁN
+        window.saveTN = (idx, val) => { tnAnswers[idx] = val; updateProgress(); }
+        window.saveDS = (id, idx, val) => { 
+            if (!dsAnswers[id]) dsAnswers[id] = {};
+            dsAnswers[id][idx] = val;
+            updateProgress();
+        }
+
+        // CẬP NHẬT PROGRESS
+        function updateProgress() {
+            let tnCount = tnAnswers.filter(a => a !== null).length;
+            let dsCount = 0;
+            Object.values(dsAnswers).forEach(item => dsCount += Object.keys(item).length);
+            const total = tnData.length + dsData.reduce((sum, q) => sum + q.statements.length, 0);
+            const done = tnCount + dsCount;
+            const percent = Math.round((done / total) * 100);
+            
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressPercent').innerText = percent + '%';
+            document.getElementById('progressDone').innerText = done;
+        }
+
+        // NỘP BÀI
+        window.submitExam = () => {
+            let tnCorrect = 0, tnWrong = [];
+            tnAnswers.forEach((ans, idx) => {
+                if (ans !== null) {
+                    if (ans === tnData[idx].correct) tnCorrect++;
+                    else tnWrong.push({
+                        id: tnData[idx].id,
+                        q: tnData[idx].question,
+                        user: tnData[idx].options[ans],
+                        correct: tnData[idx].options[tnData[idx].correct]
+                    });
+                }
+            });
+
+            let dsCorrect = 0, dsWrong = [];
+            dsData.forEach(q => {
+                if (dsAnswers[q.id]) {
+                    for (let i = 0; i < q.statements.length; i++) {
+                        if (dsAnswers[q.id][i] !== undefined) {
+                            if (dsAnswers[q.id][i] === q.correct[i]) dsCorrect++;
+                            else dsWrong.push({
+                                id: `${q.id}.${String.fromCharCode(97 + i)}`,
+                                stmt: q.statements[i],
+                                correct: q.correct[i] ? 'ĐÚNG' : 'SAI'
+                            });
+                        }
+                    }
+                }
+            });
+
+            const totalTN = tnData.length;
+            const totalDS = dsData.reduce((sum, q) => sum + q.statements.length, 0);
+            const total = totalTN + totalDS;
+            const totalCorrect = tnCorrect + dsCorrect;
+
+            document.getElementById('tnScore').innerText = `${tnCorrect}/${totalTN}`;
+            document.getElementById('dsScore').innerText = `${dsCorrect}/${totalDS}`;
+            document.getElementById('resultScore').innerText = `${totalCorrect}/${total}`;
+
+            let wrongHtml = '<div class="wrong-title">📌 CHI TIẾT CÂU SAI</div>';
+            if (tnWrong.length === 0 && dsWrong.length === 0) {
+                wrongHtml += '<p style="color:#2e7d32; text-align:center;">🎉 Xuất sắc! Không có câu sai!</p>';
+            } else {
+                tnWrong.forEach(w => wrongHtml += `
+                    <div class="wrong-item">
+                        <div class="wrong-question">Câu ${w.id}: ${w.q}</div>
+                        <div class="wrong-answer">❌ Bạn chọn: ${w.user}</div>
+                        <div class="correct-answer">✅ Đáp án: ${w.correct}</div>
+                    </div>
+                `);
+                dsWrong.forEach(w => wrongHtml += `
+                    <div class="wrong-item">
+                        <div class="wrong-question">Câu Đ/S ${w.id}</div>
+                        <div class="wrong-question">${w.stmt}</div>
+                        <div class="correct-answer">✅ Đáp án: ${w.correct}</div>
+                    </div>
+                `);
+            }
+            document.getElementById('wrongList').innerHTML = wrongHtml;
+            document.getElementById('resultModal').classList.add('show');
+        }
+
+        window.closeResult = () => document.getElementById('resultModal').classList.remove('show');
+        window.showDonate = () => document.getElementById('donateModal').classList.add('show');
+        window.closeDonate = () => document.getElementById('donateModal').classList.remove('show');
+
+        // KHỞI TẠO
+        renderTN();
+        renderDS();
+        setTimeout(() => showDonate(), 2000);
+    </script>
+</body>
+</html>
